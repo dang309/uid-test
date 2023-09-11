@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
 const { toJSON, paginate } = require('./plugins');
-const { roles } = require('../config/roles');
 
 const schema = mongoose.Schema({
   id: {
@@ -22,7 +20,6 @@ const schema = mongoose.Schema({
   },
   imageUrl: {
     type: String,
-    default: 'user',
   },
 });
 
