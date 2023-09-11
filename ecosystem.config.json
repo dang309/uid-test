@@ -8,7 +8,21 @@
       "watch": false,
       "time": true,
       "env": {
-        "NODE_ENV": "production"
+        "NODE_ENV": "production",
+        "SHOPIFY_APP_TOKEN": "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",
+        "SHOPIFY_API_KEY": "3e57170490d6ab276c03579b924acf8f",
+        "SHOPIFY_API_SECRET": "87506f0cab13b64feba812b7118b1cef",
+        "SHOPIFY_STORE_BASE_ENDPOINT": "https=//uidevify.myshopify.com/admin/api/2023-07",
+        "": "MongoDB Config info",
+        "PGDATABASE": "railway",
+        "PGHOST": "containers-us-west-81.railway.app",
+        "PGPASSWORD": "ARpw4rqSwGtKQ5cTgJRV",
+        "PGPORT": "6476",
+        "PGUSER": "postgres",
+        "MONGODB_HOST": "containers-us-west-151.railway.app",
+        "MONGODB_PASS": "Kt8I6bT4NMkOqZTMUi17",
+        "MONGODB_PORT": "5570",
+        "MONGODB_USER": "mongoMAIL_FROM=support@yourapp.com"
       }
     }
   ]
