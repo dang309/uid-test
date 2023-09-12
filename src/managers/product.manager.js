@@ -12,6 +12,41 @@ const create = async (body) => {
 };
 
 /**
+ * Create a product
+ * @param {Product[]} arr
+ * @returns {Promise<Product>}
+ */
+const createMany = async (arr) => {
+  return Product.insertMany(arr);
+};
+
+const groupByDate = async (startDate, endDate) => {
+  return Product.aggregate([
+    {
+      $match: {
+        date: {
+          $gte: startDate,
+          $lte: endDate,
+        },
+      },
+    },
+    {
+      $group: {
+        _id: '$createdDate',
+        date: { $first: { $dateToString: { date: '$createdDate', format: '%Y-%m-%d' } } },
+        numOfProducts: { $sum: 1 },
+        productIds: { $push: '$_id' },
+      },
+    },
+    {
+      $project: {
+        _id: 0, // Exclude the _id field from the result
+      },
+    },
+  ]);
+};
+
+/**
  * Query for products
  * @param {Object} filter - Mongo filter
  * @param {Object} options - Query options
@@ -70,6 +105,8 @@ const remove = async (id) => {
 
 module.exports = {
   create,
+  createMany,
+  groupByDate,
   find,
   findOne,
   update,

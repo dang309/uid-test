@@ -1,1 +1,1 @@
-module.exports.productService = require('./product.service');
+module.exports.shopifyService = require('./shopify.service');

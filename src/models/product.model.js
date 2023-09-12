@@ -2,9 +2,6 @@ const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 
 const schema = mongoose.Schema({
-  id: {
-    type: String,
-  },
   title: {
     type: String,
     required: true,
@@ -12,11 +9,9 @@ const schema = mongoose.Schema({
   },
   productType: {
     type: String,
-    required: true,
   },
   createdDate: {
-    type: String,
-    required: true,
+    type: Date,
   },
   imageUrl: {
     type: String,

@@ -11,7 +11,7 @@ module.exports = {
   },
   shopify: {
     appToken: process.env.SHOPIFY_APP_TOKEN,
-    apiToken: process.env.SHOPIFY_API_TOKEN,
+    apiKey: process.env.SHOPIFY_API_KEY,
     apiSecret: process.env.SHOPIFY_API_SECRET,
     basStoreEndpoint: process.env.SHOPIFY_STORE_BASE_ENDPOINT,
   },

@@ -3,7 +3,7 @@ const productController = require('../../controllers/product.controller');
 
 const router = express.Router();
 
-router.post('/upsert', productController.create);
-router.post('/crawl-create', productController.create);
+router.post('/upsert', productController.upsert);
+// router.post('/crawl-create', productController.create);
 
 module.exports = router;

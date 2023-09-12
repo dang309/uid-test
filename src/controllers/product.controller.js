@@ -1,43 +1,49 @@
 const httpStatus = require('http-status');
-const pick = require('../utils/pick');
-const ApiError = require('../utils/ApiError');
+const moment = require('moment');
+const { groupBy, transform } = require('lodash');
 const catchAsync = require('../utils/catchAsync');
-const { productService } = require('../services');
+const { shopifyService } = require('../services');
+const { productManager } = require('../managers');
+const ApiError = require('../utils/ApiError');
 
-const create = catchAsync(async (req, res) => {
-  const product = await productService.create(req.body);
-  res.status(httpStatus.CREATED).send(product);
-});
+const upsert = catchAsync(async (req, res) => {
+  const { begin, end } = req.body;
+  const params = {};
 
-const find = catchAsync(async (req, res) => {
-  const filter = pick(req.query, []);
-  const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  const result = await productService.find(filter, options);
-  res.status(httpStatus.OK).send(result);
-});
-
-const findOne = catchAsync(async (req, res) => {
-  const product = await productService.findOne(req.params.id);
-  if (!product) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Product not found');
+  if (begin && end) {
+    if (!moment(end).isAfter(moment(begin)))
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Start date must be before end date!');
   }
-  res.status(httpStatus.OK).send(product);
-});
 
-const update = catchAsync(async (req, res) => {
-  const product = await productService.update(req.params.id, req.body);
-  res.status(httpStatus.OK).send(product);
-});
+  if (begin) {
+    params.created_at_min = moment(new Date(begin)).format('YYYY-MM-DD');
+  }
+  if (end) {
+    params.created_at_max = moment(new Date(end)).format('YYYY-MM-DD');
+  }
 
-const remove = catchAsync(async (req, res) => {
-  await productService.remove(req.params.id);
-  res.status(httpStatus.NO_CONTENT).send();
+  const products = await shopifyService.getProducts(params);
+
+  const productsToInsert = products.map((product) => ({
+    title: product.title,
+    productType: product.product_type,
+    createdDate: product.created_at,
+    imageUrl: product.image?.src,
+  }));
+
+  const newProducts = await productManager.createMany(productsToInsert);
+  const productsToReturns = await productManager.groupByDate(begin, end);
+
+  // const productsToReturns = products.reduce((acc, product) => {
+  //   const key = moment(product.created_at).format('YYYY-MM-DD');
+  //   if (acc[key]) acc[key]++;
+  //   else acc[key] = 1;
+  //   return acc;
+  // }, {});
+
+  return res.status(httpStatus.OK).send(productsToReturns);
 });
 
 module.exports = {
-  create,
-  find,
-  findOne,
-  update,
-  remove,
+  upsert,
 };
