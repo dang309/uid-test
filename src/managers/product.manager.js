@@ -31,8 +31,20 @@ const groupByDate = async (startDate, endDate) => {
       },
     },
     {
+      $addFields: {
+        dateObj: {
+          $dateFromString: {
+            dateString: {
+              $substr: ['$createdDate', 0, 10], // Extract the first 10 characters (date part) from the 'date' field
+            },
+            format: '%Y-%m-%d',
+          },
+        },
+      },
+    },
+    {
       $group: {
-        _id: '$createdDate',
+        _id: '$dateObj',
         date: { $first: { $dateToString: { date: '$createdDate', format: '%Y-%m-%d' } } },
         numOfProducts: { $sum: 1 },
         productIds: { $push: '$_id' },
