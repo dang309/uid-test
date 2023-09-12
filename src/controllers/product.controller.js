@@ -1,6 +1,5 @@
 const httpStatus = require('http-status');
 const moment = require('moment');
-const { groupBy, transform } = require('lodash');
 const catchAsync = require('../utils/catchAsync');
 const { shopifyService } = require('../services');
 const { productManager } = require('../managers');
@@ -31,19 +30,42 @@ const upsert = catchAsync(async (req, res) => {
     imageUrl: product.image?.src,
   }));
 
-  const newProducts = await productManager.createMany(productsToInsert);
+  await productManager.createMany(productsToInsert);
   const productsToReturns = await productManager.groupByDate(begin, end);
 
-  // const productsToReturns = products.reduce((acc, product) => {
-  //   const key = moment(product.created_at).format('YYYY-MM-DD');
-  //   if (acc[key]) acc[key]++;
-  //   else acc[key] = 1;
-  //   return acc;
-  // }, {});
+  return res.status(httpStatus.CREATED).send(productsToReturns);
+});
 
-  return res.status(httpStatus.OK).send(productsToReturns);
+const crawlCreate = catchAsync(async (req, res) => {
+  const { link } = req.body;
+  const product = await shopifyService.fetchProductByUrl(link);
+
+  const productToSave = {
+    title: product.title,
+    productType: product.product_type,
+    createdDate: product.created_at,
+    imageUrl: product.image?.src,
+  };
+
+  const newProduct = await productManager.create(productToSave);
+
+  const productToSaveForShopify = {
+    product: {
+      title: product.title,
+      body_html: product.body_html,
+      vendor: product.vendor,
+      product_type: product.product_type,
+    },
+  };
+
+  await shopifyService.createProduct(productToSaveForShopify);
+
+  return res.status(httpStatus.CREATED).send({
+    productId: newProduct.id,
+  });
 });
 
 module.exports = {
   upsert,
+  crawlCreate,
 };

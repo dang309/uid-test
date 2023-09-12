@@ -24,9 +24,9 @@ const groupByDate = async (startDate, endDate) => {
   return Product.aggregate([
     {
       $match: {
-        date: {
-          $gte: startDate,
-          $lte: endDate,
+        createdDate: {
+          $gte: new Date(startDate),
+          $lte: new Date(endDate),
         },
       },
     },
